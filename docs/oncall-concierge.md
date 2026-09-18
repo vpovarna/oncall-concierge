@@ -84,8 +84,8 @@ oncall-concierge/
 Don't move on until the milestone's definition of done (DoD) is met. Write a short ADR at the end of each one.
 
 ### M0 — Setup (½ day)
-- [ ] Init module, pin ADK version
-- [ ] Run the official ADK Go quickstart unchanged
+- [X] Init module, pin ADK version
+- [X] Run the official ADK Go quickstart unchanged
 
 **DoD:** the quickstart agent answers in the dev web UI.
 
