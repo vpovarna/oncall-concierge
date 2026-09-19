@@ -4,6 +4,7 @@ go 1.26.6
 
 require (
 	github.com/joho/godotenv v1.5.1
+	github.com/rs/zerolog v1.35.1
 	google.golang.org/adk/v2 v2.4.0
 )
 
@@ -31,6 +32,8 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/openai/openai-go/v3 v3.54.0 // indirect
 	github.com/tidwall/gjson v1.19.0 // indirect

@@ -1,0 +1,54 @@
+[
+  {
+    "service": "payments",
+    "title": "Payment Service Timeout / Failure",
+    "steps": [
+      "Check Grafana dashboard: payments-overview for error rate and p99 latency.",
+      "Verify the payments pod is healthy: kubectl get pods -n payments.",
+      "Check downstream dependency (Stripe API) status at status.stripe.com.",
+      "If pods are crash-looping, inspect logs: kubectl logs -n payments -l app=payments --tail=200.",
+      "If latency spike only, check connection pool saturation in the payments DB metrics.",
+      "Restart the deployment if needed: kubectl rollout restart deployment/payments -n payments.",
+      "Escalate to #payments-eng if error rate does not drop within 10 minutes of restart."
+    ]
+  },
+  {
+    "service": "auth",
+    "title": "Authentication Service Outage",
+    "steps": [
+      "Confirm scope of impact: check whether login, token refresh, or both are failing.",
+      "Inspect auth service logs: kubectl logs -n auth -l app=auth-service --tail=200.",
+      "Verify Redis session store is reachable: redis-cli -h redis.auth.svc ping.",
+      "Check if a recent config or certificate rotation caused the issue: git log --oneline -5 in the auth-config repo.",
+      "If Redis is down, failover to the replica: kubectl exec -n auth redis-0 -- redis-cli cluster failover.",
+      "Restart auth pods: kubectl rollout restart deployment/auth-service -n auth.",
+      "Escalate to #identity-team if login success rate stays below 99% after restart."
+    ]
+  },
+  {
+    "service": "database",
+    "title": "Primary Database Connection Exhaustion",
+    "steps": [
+      "Check active connections: SELECT count(*) FROM pg_stat_activity;",
+      "Identify long-running queries: SELECT pid, now() - pg_stat_activity.query_start AS duration, query FROM pg_stat_activity WHERE state = 'active' ORDER BY duration DESC LIMIT 10;",
+      "Check if connection pooler (PgBouncer) is saturated: show pools; in PgBouncer admin console.",
+      "Kill long-running idle-in-transaction sessions if safe: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle in transaction' AND query_start < now() - interval '10 minutes';",
+      "If PgBouncer is the bottleneck, increase max_client_conn and reload: pgbouncer -R.",
+      "Check for recent schema migrations that may have acquired locks: SELECT * FROM pg_locks WHERE granted = false;",
+      "Escalate to #data-platform if connections remain exhausted after clearing idle sessions."
+    ]
+  },
+  {
+    "service": "notifications",
+    "title": "Notification Delivery Delays",
+    "steps": [
+      "Check the notification queue depth in Kafka: kafka-consumer-groups.sh --describe --group notification-workers.",
+      "Verify notification worker pods are running: kubectl get pods -n notifications.",
+      "Inspect worker logs for errors or backpressure: kubectl logs -n notifications -l app=notification-worker --tail=200.",
+      "Check downstream email provider (SendGrid) status at status.sendgrid.com.",
+      "If queue is growing, scale up workers: kubectl scale deployment/notification-worker -n notifications --replicas=6.",
+      "If messages are stuck on a specific partition, check for poison messages and skip if necessary.",
+      "Escalate to #notifications-eng if delivery latency exceeds SLA (5 minutes) after scaling."
+    ]
+  }
+]

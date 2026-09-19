@@ -6,6 +6,7 @@
         "llmagent",
         "oncall",
         "openaimodel",
-        "vpovarna"
+        "vpovarna",
+        "zerolog"
     ]
 }

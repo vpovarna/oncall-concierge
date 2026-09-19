@@ -1,0 +1,26 @@
+[
+  {
+    "service": "kubernetes",
+    "title": "Kubernetes Node Not Ready",
+    "steps": [
+      "Identify the affected node: kubectl get nodes.",
+      "Check node conditions: kubectl describe node <node-name>.",
+      "Inspect kubelet logs: journalctl -u kubelet -n 200 on the node.",
+      "Check disk pressure and memory pressure conditions.",
+      "If node is unrecoverable, cordon and drain: kubectl cordon <node> && kubectl drain <node> --ignore-daemonsets --delete-emptydir-data.",
+      "Escalate to #infra-team if multiple nodes are affected."
+    ]
+  },
+  {
+    "service": "cdn",
+    "title": "CDN Cache Miss Rate Spike",
+    "steps": [
+      "Check CDN dashboard for cache hit ratio drop.",
+      "Verify origin server health and response times.",
+      "Check if a recent deployment invalidated the cache.",
+      "Review cache-control headers on affected endpoints.",
+      "If origin is overloaded, scale up origin servers.",
+      "Escalate to #platform-eng if miss rate stays above 40% for 15 minutes."
+    ]
+  }
+]
