@@ -7,10 +7,25 @@ import (
 	"google.golang.org/adk/v2/agent"
 )
 
-func GetRunbook(_ agent.Context, in GetRunbookInput) (Runbook, error) {
-	return Runbook{}, fmt.Errorf("not implemented: GetRunbook(%s)", strings.ToLower(in.Service))
+func (r *Registry) GetRunbookTool() func(agent.Context, GetRunbookInput) (Runbook, error) {
+	return func(_ agent.Context, in GetRunbookInput) (Runbook, error) {
+		service := strings.ToLower(in.Service)
+		rb, ok := r.runbooks[service]
+		if !ok {
+			return Runbook{}, fmt.Errorf("no runbook found for service: %s", service)
+		}
+
+		return rb, nil
+
+	}
 }
 
-func ListRunbooks(_ agent.Context, in struct{}) (ListRunbooksOutput, error) {
-	return ListRunbooksOutput{}, fmt.Errorf("not implemented: ListRunbooks")
+func (r *Registry) ListRunbooksTool() func(agent.Context, struct{}) (ListRunbooksOutput, error) {
+	return func(ctx agent.Context, s struct{}) (ListRunbooksOutput, error) {
+		services := make([]string, 0, len(r.runbooks))
+		for s := range r.runbooks {
+			services = append(services, s)
+		}
+		return ListRunbooksOutput{Services: services}, nil
+	}
 }
