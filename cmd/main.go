@@ -35,12 +35,15 @@ func main() {
 	// Load runbooks
 	logger := logger.New("info")
 	runbookService := runbook.NewService(&logger)
-	runbooks, err := runbookService.NewRegistryFromDir("runbooks")
+	registry, err := runbookService.NewRegistryFromDir("runbooks")
+
 	if err != nil {
-		logger.Error().Err(err).Msg("Unable to load runbooks jos files")
+		logger.Error().Err(err).Msg("Unable to load registry jos files")
 	}
 
-	fmt.Printf("Runbooks: %s", runbooks)
+	fmt.Printf("Registry: %s", registry)
+
+	
 
 	// model, err := openaimodel.NewModel(ctx, modelName, &openaimodel.ClientConfig{
 	// 	APIKey:  apiKey,
